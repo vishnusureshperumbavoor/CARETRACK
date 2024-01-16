@@ -1,13 +1,24 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Admin = () => {
+  const navigate = useNavigate();
+ 
+  const handleExistingUserClick = () => {
+   // Replace '/existing-user' with the actual path you want to navigate to
+   navigate('/existinguser');
+  };
+  const handleNewUserClick = () => {
+    // Replace '/existing-user' with the actual path you want to navigate to
+    navigate('/newuser');
+   };
+ 
  
 
  return (
      <div>
-         <button >Existing User</button>
-         <button>New User</button>
+          <button onClick={handleExistingUserClick}>Existing User</button>
+          <button onClick={handleNewUserClick}>New User</button>
      </div>
  );
 };
