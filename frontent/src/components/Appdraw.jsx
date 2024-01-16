@@ -37,7 +37,7 @@ function Appdraw() {
        <Button color="inherit">About</Button>
      </Toolbar>
    </AppBar>
-   <Drawer anchor="left" open={open} onClose={handleDrawerClose} PaperProps={{ style: { backgroundColor: '#00838f', color: 'white' } }}>
+   <Drawer anchor="left" open={open} onClose={handleDrawerClose} PaperProps={{ style: { backgroundColor: '#00838f', color: '#e0f7fa' } }}>
      <List>
        <ListItem button onClick={handleDrawerClose}>
          <ListItemText primary="User Details" />
