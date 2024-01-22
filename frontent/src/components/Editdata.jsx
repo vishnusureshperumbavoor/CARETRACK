@@ -1,46 +1,37 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
-export default class FileUploadComponent extends Component {
+function Editdata() {
+  const [file, setFile] = useState();
 
- constructor(props) {
-   super(props);
+  function handleChange(event) {
+    setFile(event.target.files[0]);
+  }
 
-   this.onFileChange = this.onFileChange.bind(this);
-   this.onSubmit = this.onSubmit.bind(this);
+  async function handleUpload(event) {
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append('file', file);
 
-   this.state = {
-       file: ''
-   }
- }
+    try {
+      const response = await axios.post('http://localhost:4000/uploadFile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  }
 
- onFileChange(e) {
-     this.setState({ file: e.target.files[0] })
- }
-
- onSubmit(e) {
-     e.preventDefault();
-     const formData = new FormData();
-     formData.append('file', this.state.file);
-     axios.post("http://localhost:5000/api/user-profile", formData, {}).then(res => {
-         console.log(res);
-     });
- }
-
- render() {
-   return (
-     <div className="container">
-       <h3>Patient Data</h3>
-       <hr/>
-       <form onSubmit={this.onSubmit}>
-           <div className="form-group">
-               <input type="file" onChange={this.onFileChange} />
-           </div>
-           <div className="form-group">
-               <button className="btn btn-primary" type="submit">Upload</button>
-           </div>
-       </form>
-     </div>
-   );
- }
+  return (
+    <div>
+      <h1>Editdata</h1>
+      <input type="file" onChange={handleChange} />
+      <button onClick={handleUpload}>Upload</button>
+    </div>
+  );
 }
+
+export default Editdata;

@@ -14,12 +14,17 @@
     "@serialport/parser-readline": "^12.0.0",
     "axios": "^1.6.5",
     "body-parser": "^1.20.2",
+    "bootstrap": "^5.3.2",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "express": "^4.18.2",
+    "gridfs-stream": "^1.1.1",
     "mongodb": "^6.3.0",
     "mongoose": "^8.1.0",
-    "multer": "^1.4.5-lts.1",
+    "multer": "^1.4.4",
+    "multer-gridfs-storage": "^5.0.2",
     "nodemon": "^3.0.3",
+    "react-dropzone": "^14.2.3",
     "serialport": "^12.0.0"
   }
 }

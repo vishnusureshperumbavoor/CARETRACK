@@ -1,56 +1,58 @@
 const express = require('express');
 const multer = require('multer');
-const router = express.Router();
-const MongoClient = require('mongodb').MongoClient;
-const bodyParser = require('body-parser');
 const cors = require('cors');
+const mongoose = require('mongoose');
+const { GridFsStorage } = require('multer-gridfs-storage');
+const Grid = require('gridfs-stream');
 
+const mongoURI = 'mongodb+srv://akshaymmaimbilly:akshaymm@cluster0.iyvhtug.mongodb.net/?retryWrites=true&w=majority';
 
-const app = express();
-app.use(cors());
-app.use(bodyParser.json());
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
 
-const url = 'mongodb+srv://akshaymmaimbilly:akshaymm@cluster0.iyvhtug.mongodb.net/?retryWrites=true&w=majority'; // replace with your MongoDB connection string
-const dbName = 'caretrack'; // replace with your database name
+const conn = mongoose.connection;
 
-let db;
-
-MongoClient.connect(url, { useUnifiedTopology: true }, (err, client) => {
- if (err) return console.log(err);
- db = client.db(dbName);
+conn.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
 });
 
-app.get('/api/patient', (req, res) => {
- db.collection('patients') // replace with your collection name
-  .findOne() // adjust this according to your query
-  .then(patient => {
-    res.send(patient);
-  })
-  .catch(err => console.error(err));
-});
+conn.once('open', () => {
+  console.log('Connected to MongoDB');
 
+  const gfs = Grid(conn.db, mongoose.mongo);
+  gfs.collection('uploads');
 
+  const storage = new GridFsStorage({
+    url: mongoURI,
+    file: (req, file) => {
+      return new Promise((resolve, reject) => {
+        const fileInfo = {
+          filename: Date.now() + '-' + file.originalname,
+          bucketName: 'uploads',
+        };
+        resolve(fileInfo);
+      });
+    },
+  });
 
+  const upload = multer({ storage: storage });
 
+  const app = express();
+  app.use(cors());
 
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    var dirName = path.join(process.cwd(), './files/');
-    if (!fs.existsSync(dirName)){
-      fs.mkdirSync(dirName);
+  app.post('/uploadFile', upload.single('file'), (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json("No file uploaded");
+      }
+      return res.status(201).json("File uploaded");
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json("Internal Server Error");
     }
-    cb(null, dirName);
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
- });
- 
- var upload = multer({ storage: storage });
- 
- router.post("/api/user-profile", upload.single('file'), (req, res) => {
-  console.log(req.file.destination); // image url
-  console.log(JSON.parse(req.body)); // other things
- });
+  });
 
-app.listen(5000, () => console.log('Server started on port 5000'));
+  const port = 4000;
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+});
