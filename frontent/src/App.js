@@ -2,9 +2,10 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './components/HomePage';
 
-import ExistingUser from './components/ExistingUser';
-import NewUser from './components/NewUser';
+
 import Appdraw from './components/Appdraw';
+import Showdata from './components/Showdata';
+import Editdata from './components/Editdata';
 
 function App() {
  return (
@@ -13,8 +14,8 @@ function App() {
      <Routes>
       
        <Route path="/" element={<HomePage />} />
-       <Route path="/existinguser" element={<ExistingUser />} />
-       <Route path="/newuser" element={<NewUser />} />
+       <Route path="showdata" element={<Showdata />} />
+       <Route path="editdata" element={<Editdata />} />
      </Routes>
    </Router>
  );
