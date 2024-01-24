@@ -1,9 +1,15 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const multer = require('multer');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const { GridFsStorage } = require('multer-gridfs-storage');
 const Grid = require('gridfs-stream');
+const bcrypt = require('bcrypt');
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
 
 const mongoURI = 'mongodb+srv://akshaymmaimbilly:akshaymm@cluster0.iyvhtug.mongodb.net/?retryWrites=true&w=majority';
 
@@ -18,6 +24,7 @@ conn.on('error', (err) => {
 conn.once('open', () => {
   console.log('Connected to MongoDB');
 
+  // GridFS setup
   const gfs = Grid(conn.db, mongoose.mongo);
   gfs.collection('uploads');
 
@@ -27,7 +34,6 @@ conn.once('open', () => {
       return new Promise((resolve, reject) => {
         const fileInfo = {
           filename: Date.now() + '-' + file.originalname,
-          bucketName: 'uploads',
         };
         resolve(fileInfo);
       });
@@ -36,10 +42,67 @@ conn.once('open', () => {
 
   const upload = multer({ storage: storage });
 
-  const app = express();
-  app.use(cors());
+  // User Model
+  const userSchema = new mongoose.Schema({
+    username: String,
+    password: String,
+  });
 
-  app.post('/uploadFile', upload.single('file'), (req, res) => {
+  const User = mongoose.model('User', userSchema);
+
+  // Admin Model
+  const adminSchema = new mongoose.Schema({
+    username: String,
+    password: String,
+  });
+
+  const Admin = mongoose.model('Admin', adminSchema);
+
+  // User Register
+  app.post('/api/user/register', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+      const existingUser = await User.findOne({ username });
+
+      if (existingUser) {
+        return res.json({ success: false, message: 'Username already exists' });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const newUser = new User({ username, password: hashedPassword });
+      await newUser.save();
+
+      res.json({ success: true, message: 'User registered successfully' });
+    } catch (error) {
+      console.error('Error during user registration:', error.message);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  });
+
+  // User Login
+  app.post('/api/user/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    const user = await User.findOne({ username });
+
+    if (user) {
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if (passwordMatch) {
+        res.json({ success: true, message: 'Login successful' });
+      } else {
+        res.json({ success: false, message: 'Invalid credentials' });
+      }
+    } else {
+      res.json({ success: false, message: 'Invalid credentials' });
+    }
+  });
+
+
+  // File Upload
+  app.post('/uploadFile', upload.single('<your_file_field_name>'), (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json("No file uploaded");

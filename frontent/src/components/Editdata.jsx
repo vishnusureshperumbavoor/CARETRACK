@@ -34,4 +34,4 @@ function Editdata() {
   );
 }
 
-export default Editdata;
+export default Editdata;
