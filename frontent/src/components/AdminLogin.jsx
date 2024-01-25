@@ -1,10 +1,12 @@
 // UserLogin.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
@@ -12,6 +14,7 @@ const AdminLogin = () => {
 
       if (response.data.success) {
         alert('Login successful');
+        navigate('/dashboard'); // Redirect to the dashboard or any other page on successful login
       } else {
         alert('Invalid credentials');
       }

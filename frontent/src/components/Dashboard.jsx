@@ -1,13 +1,15 @@
 // Dashboard.js
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import './css/Dashboard.css'; // Import your CSS file for styling
 
 const Dashboard = () => {
   const [patientName, setPatientName] = useState('');
   const [pdfFile, setPdfFile] = useState(null);
+  const navigate = useNavigate();
 
   const handleFileChange = (e) => {
-    // Handle PDF file change
     const selectedFile = e.target.files[0];
 
     if (selectedFile) {
@@ -22,11 +24,9 @@ const Dashboard = () => {
         return;
       }
 
-      // Create a FormData object
       const formData = new FormData();
       formData.append('patientName', patientName);
 
-      // Check if pdfFile has 'name' property before appending to FormData
       if (pdfFile.name) {
         formData.append('pdfFile', pdfFile, pdfFile.name);
       } else {
@@ -34,10 +34,9 @@ const Dashboard = () => {
         return;
       }
 
-      // Make the API request using axios
       const response = await axios.post('http://localhost:4000/api/patient/add', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data', // Set the content type for FormData
+          'Content-Type': 'multipart/form-data',
         },
       });
 
@@ -52,8 +51,21 @@ const Dashboard = () => {
     }
   };
 
+  const handleLogout = () => {
+    // Clear any user-related data (replace with your actual logout logic)
+    // For example, if using localStorage for authentication token:
+    localStorage.removeItem('authToken');
+
+    // Redirect the user to the login page
+    navigate('/admin'); // Replace '/login' with your actual login route
+  };
+
+  const navigateToHome = () => {
+    navigate('/');
+  };
+
   return (
-    <div>
+    <div className="dashboard-container">
       <h2>Dashboard</h2>
       <div>
         <label>Patient Name:</label>
@@ -63,7 +75,13 @@ const Dashboard = () => {
         <label>Upload PDF:</label>
         <input type="file" accept=".pdf" onChange={handleFileChange} />
       </div>
-      <button onClick={handleSubmit}>Submit</button>
+      <button className="submit-button" onClick={handleSubmit}>Submit</button>
+
+      {/* Logout Button */}
+      <button className="logout-button" onClick={handleLogout}>Logout</button>
+
+      {/* Home Button */}
+      <button className="home-button" onClick={navigateToHome}>Go Home</button>
     </div>
   );
 };

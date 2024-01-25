@@ -2,28 +2,35 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 function Editdata() {
-  const [file, setFile] = useState();
+  const [file, setFile] = useState(null);
 
-  function handleChange(event) {
+  const handleChange = (event) => {
     setFile(event.target.files[0]);
-  }
+  };
 
-  async function handleUpload(event) {
+  const handleUpload = async (event) => {
     event.preventDefault();
-    const formData = new FormData();
-    formData.append('file', file);
 
     try {
+      if (!file) {
+        console.error('No file selected');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
       const response = await axios.post('http://localhost:4000/uploadFile', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
+
       console.log(response.data);
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error('Error uploading file:', error.message);
     }
-  }
+  };
 
   return (
     <div>

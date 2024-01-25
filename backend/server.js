@@ -4,7 +4,6 @@ const multer = require('multer');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const { GridFsStorage } = require('multer-gridfs-storage');
-const Grid = require('gridfs-stream');
 const bcrypt = require('bcrypt');
 
 const app = express();
@@ -13,39 +12,31 @@ app.use(bodyParser.json());
 
 const mongoURI = 'mongodb+srv://akshaymmaimbilly:akshaymm@cluster0.iyvhtug.mongodb.net/?retryWrites=true&w=majority';
 
-mongoose.connect(mongoURI, { });
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
 
-const conn = mongoose.connection;
+const connection = mongoose.connection;
 
-conn.on('error', (err) => {
+connection.on('error', (err) => {
   console.error('MongoDB connection error:', err);
 });
 
-conn.once('open', () => {
+connection.once('open', () => {
   console.log('Connected to MongoDB');
-
-  // GridFS setup
-  // const gfs = Grid(conn.db, mongoose.mongo);
-  // gfs.collection('uploads');
 
   const storage = new GridFsStorage({
     url: mongoURI,
     cache: true,
     file: (req, file) => {
-      // instead of an object a string is returned
-      return 'file_' + Date.now();
+      return {
+        filename: 'file_' + Date.now(),
+        bucketName: 'uploads',
+      };
     },
   });
 
   const upload = multer({ storage });
 
-  // Define models
   const User = mongoose.model('User', new mongoose.Schema({
-    username: String,
-    password: String,
-  }));
-
-  const Admin = mongoose.model('Admin', new mongoose.Schema({
     username: String,
     password: String,
   }));
@@ -58,32 +49,42 @@ conn.once('open', () => {
 
   const Patient = mongoose.model('Patient', new mongoose.Schema({
     patientName: String,
-    pdfFile: String,
+    pdfFileId: String, // Store the GridFS file ID
   }));
 
-  // API endpoint for handling form data // upload.single('file')
-  app.post('/api/patient/add', async (req, res) => {
-    console.log("hi hello")
-    console.log(req.pdfFile)
+  app.post('/api/patient/add', upload.single('pdfFile'), async (req, res) => {
     try {
       const { patientName } = req.body;
+      const pdfFile = req.file;
 
-      // Save patient data in MongoDB
+      if (!pdfFile) {
+        return res.status(400).json({ success: false, message: 'No PDF file uploaded' });
+      }
+
+      // Save the file to MongoDB using GridFS
+      const gfs = new mongoose.mongo.GridFSBucket(connection.db, {
+        bucketName: 'uploads',
+      });
+
+      const writeStream = gfs.openUploadStream(pdfFile.originalname);
+      writeStream.write(pdfFile.buffer);
+      writeStream.end();
+
+      // Save patient data with the GridFS file ID
       const newPatient = new Patient({
-        patientName: patientName,
-        pdfFile: req.pdfFile,
+        patientName,
+        pdfFileId: writeStream.id, // Store the GridFS file ID in the Patient model
       });
 
       await newPatient.save();
 
-      res.json({ success: true });
+      return res.status(201).json({ success: true, message: 'Patient data added successfully' });
     } catch (error) {
       console.error('Error during patient data saving:', error.message);
-      res.json({ success: false, error: error.message });
+      return res.status(500).json({ success: false, message: 'Internal Server Error', error: error.message });
     }
   });
 
-  // User Register
   app.post('/api/user/register', async (req, res) => {
     const { username, password } = req.body;
 
@@ -106,7 +107,6 @@ conn.once('open', () => {
     }
   });
 
-  // User Login
   app.post('/api/user/login', async (req, res) => {
     const { username, password } = req.body;
 
@@ -125,31 +125,25 @@ conn.once('open', () => {
     }
   });
 
-  // File Upload
   app.post('/uploadFile', upload.single('file'), async (req, res) => {
-    console.log("app post")
-    console.log(req.file)
     try {
       if (!req.file) {
-        return res.status(400).json({ success: false, message: "No file uploaded" });
+        return res.status(400).json({ success: false, message: 'No file uploaded' });
       }
 
-      // Save file information to MongoDB
       const fileInfo = {
         filename: req.file.filename,
-        id: req.file.filename + "_" + new Date(),
         fileId: req.file.id,
         uploadDate: new Date(),
       };
 
-      console.log(fileInfo)
       const fileInfoModel = new FileInfo(fileInfo);
       await fileInfoModel.save();
 
-      return res.status(201).json({ success: true, message: "File uploaded", fileInfo });
+      return res.status(201).json({ success: true, message: 'File uploaded', fileInfo });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ success: false, message: "Internal Server Error" });
+      return res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
   });
 
