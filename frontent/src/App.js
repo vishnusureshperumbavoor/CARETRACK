@@ -22,7 +22,7 @@ function App() {
        <Route path="editdata" element={<Editdata />} />
        <Route path="register" element={<Register />} />
        <Route path="admin" element={<AdminLogin />} />
-       <Route path="/dashboard" component={Dashboard} />
+       <Route path="/dashboard" element={<Dashboard/>} />
      </Routes>
    </Router>
  );

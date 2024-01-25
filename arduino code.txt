@@ -1,0 +1,25 @@
+//arduino code
+
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+#include <MFRC522.h>
+#include <SPI.h>
+
+#define SS_PIN 10
+#define RST_PIN 9
+
+MFRC522 rfid(SS_PIN, RST_PIN);
+LiquidCrystal_I2C lcd(0x27, 16, 2); // Change the address if needed
+
+void setup() {
+  Serial.begin(9600);
+  SPI.begin();
+  lcd.begin(16, 2);
+  lcd.print("Welcome!");
+
+  rfid.PCD_Init();
+}
+
+void loop() {
+  lcd.clear();
+  lcd.print("Connect RFID");

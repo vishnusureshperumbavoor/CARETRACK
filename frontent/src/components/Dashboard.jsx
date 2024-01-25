@@ -8,17 +8,38 @@ const Dashboard = () => {
 
   const handleFileChange = (e) => {
     // Handle PDF file change
-    setPdfFile(e.target.files[0]);
+    const selectedFile = e.target.files[0];
+
+    if (selectedFile) {
+      setPdfFile(selectedFile);
+    }
   };
 
   const handleSubmit = async () => {
     try {
+      if (!patientName || !pdfFile) {
+        alert('Please provide both patient name and upload a PDF file');
+        return;
+      }
+
+      // Create a FormData object
       const formData = new FormData();
       formData.append('patientName', patientName);
-      formData.append('pdfFile', pdfFile);
 
-      // Send form data to server and save in MongoDB
-      const response = await axios.post('http://localhost:4000/api/patient/add', formData);
+      // Check if pdfFile has 'name' property before appending to FormData
+      if (pdfFile.name) {
+        formData.append('pdfFile', pdfFile, pdfFile.name);
+      } else {
+        alert('PDF file information is missing.');
+        return;
+      }
+
+      // Make the API request using axios
+      const response = await axios.post('http://localhost:4000/api/patient/add', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Set the content type for FormData
+        },
+      });
 
       if (response.data.success) {
         alert('Patient data added successfully');
@@ -27,6 +48,7 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error('Error during patient data submission:', error.message);
+      alert('Network Error: Unable to reach the server');
     }
   };
 
