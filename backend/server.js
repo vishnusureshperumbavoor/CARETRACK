@@ -17,11 +17,13 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
 const connection = mongoose.connection;
 
 connection.on('error', (err) => {
-  console.error('MongoDB connection error:', err);
+ console.error('MongoDB connection error:', err);
 });
 
-connection.once('open', () => {
-  console.log('Connected to MongoDB');
+connection.once('open', async () => {
+ console.log('Connected to MongoDB');
+
+ 
 
   const storage = new GridFsStorage({
     url: mongoURI,
@@ -49,9 +51,10 @@ connection.once('open', () => {
 
   const Patient = mongoose.model('Patient', new mongoose.Schema({
     patientName: String,
-    pdfFileId: String, // Store the GridFS file ID
+    pdfFileId: String,
   }));
 
+ 
   app.post('/api/patient/add', upload.single('pdfFile'), async (req, res) => {
     try {
       const { patientName } = req.body;

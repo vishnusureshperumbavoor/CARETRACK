@@ -10,6 +10,7 @@ import Editdata from './components/Editdata';
 import Register from './components/Register';
 import AdminLogin from './components/AdminLogin';
 import Dashboard from './components/Dashboard';
+import RFID from './components/RFID';
 
 function App() {
  return (
@@ -23,6 +24,7 @@ function App() {
        <Route path="register" element={<Register />} />
        <Route path="admin" element={<AdminLogin />} />
        <Route path="dashboard" element={<Dashboard/>} />
+       <Route path="rfid" element={<RFID/>} />
      </Routes>
    </Router>
  );
