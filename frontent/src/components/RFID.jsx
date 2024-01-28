@@ -1,18 +1,33 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
 import './css/RFID.css';
+import io from 'socket.io-client';
 
 const RFID = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [rfidData, setRfidData] = useState('');
+  const [isScanning, setIsScanning] = useState(false);
+
+  // Connect to the WebSocket server
+  const socket = io('http://localhost:4000'); // Replace with your server address
 
   const handleScan = () => {
-    // Add RFID scanning logic here
-    console.log('Scanning RFID...');
-    setIsModalOpen(true); // Open the modal
+    if (!isScanning) {
+      setIsScanning(true);
+      // Emit a signal to the Arduino to start scanning
+      socket.emit('startRFIDScan');
+
+      // Listen for RFID data from the Arduino
+      socket.on('rfidData', (data) => {
+        setRfidData(data);
+        setIsModalOpen(true); // Open the modal when RFID data is received
+        setIsScanning(false); // Reset the scanning flag
+      });
+    }
   };
 
   const closeModal = () => {
-    setIsModalOpen(false); // Close the modal
+    setIsModalOpen(false);
   };
 
   return (
@@ -28,8 +43,8 @@ const RFID = () => {
         className="modal"
       >
         <div>
-          <h2>Scanning RFID...</h2>
-          {/* Add your scanning process UI here */}
+          <h2>RFID Scanned</h2>
+          <p>RFID Data: {rfidData}</p>
           <button onClick={closeModal}>Close</button>
         </div>
       </Modal>
