@@ -3,6 +3,12 @@ import { Link } from 'react-router-dom';
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
+
+// Define your function to send a signal to Arduino here
+function sendSignalToArduino() {
+ // Your implementation here
+}
+
 const headingVariants = {
  hidden: { y: "100vh" },
  visible: { 
@@ -10,7 +16,7 @@ const headingVariants = {
  transition: {
  type: "spring",
  mass: 0.4,
- damping: 1,
+ damping: 10,
  },
  },
 };
@@ -36,42 +42,42 @@ const buttonVariants = {
     },
     },
    };
-   
 
-   const Button = ({ children, onClick, variants, to }) => {
-    const navigate = useNavigate();
-   
-    const handleOnClick = (event) => {
+const Button = ({ children, onClick, variants, to, sendSignal }) => {
+ const navigate = useNavigate();
+
+ const handleOnClick = (event) => {
     if (typeof onClick === 'function') {
-     onClick(event);
+      onClick(event);
+    }
+    if (sendSignal) {
+      // Call your method to send a signal to Arduino here
+      sendSignal();
     }
     navigate(to);
-    };
-   
-    return (
-    <motion.button 
-     variants={variants} 
-     initial="hidden" 
-     animate="visible"
-     onClick={handleOnClick} 
-     style={{ 
-        margin: '10px',
-        padding: '15px 25px', // Increased padding
-        fontSize: '20px', // Increased font size
-        backgroundColor: '#00838f',
-        color: '#ffffff',
-        borderRadius: '5px',
-        boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)',
-        transition: 'all 0.3s ease 0s',
-        }}
-    >
-     {children}
-    </motion.button>
-    );
-   };
-   
-   
-   
+ };
+
+ return (
+ <motion.button 
+   variants={variants} 
+   initial="hidden" 
+   animate="visible"
+   onClick={handleOnClick} 
+   style={{ 
+      margin: '10px',
+      padding: '15px 25px', // Increased padding
+      fontSize: '20px', // Increased font size
+      backgroundColor: '#00838f',
+      color: '#ffffff',
+      borderRadius: '5px',
+      boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)',
+      transition: 'all 0.3s ease 0s',
+      }}
+ >
+   {children}
+ </motion.button>
+ );
+};
 
 const HomePage = () => {
  const [showOptions, setShowOptions] = React.useState(false);
@@ -102,8 +108,8 @@ const HomePage = () => {
  </motion.h1>
  {showOptions && (
  <>
-<Button variants={buttonVariants} to="showdata">Show Data</Button>
- <Button variants={buttonVariantsRight} to="editdata">Edit Data</Button>
+ <Button variants={buttonVariants} to="showdata">Show Data</Button>
+ <Button variants={buttonVariantsRight} to="editdata" sendSignal={sendSignalToArduino}>Edit Data</Button>
  </>
  )}
  <Link to="/admin"></Link>

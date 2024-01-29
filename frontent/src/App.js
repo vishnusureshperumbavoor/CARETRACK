@@ -11,6 +11,7 @@ import Register from './components/Register';
 import AdminLogin from './components/AdminLogin';
 import Dashboard from './components/Dashboard';
 import RFID from './components/RFID';
+import RfidScanPage from './components/RfidScanPage';
 
 function App() {
  return (
@@ -25,6 +26,7 @@ function App() {
        <Route path="admin" element={<AdminLogin />} />
        <Route path="dashboard" element={<Dashboard/>} />
        <Route path="rfid" element={<RFID/>} />
+       <Route path="rfidscan" element={<RfidScanPage/>} />
      </Routes>
    </Router>
  );

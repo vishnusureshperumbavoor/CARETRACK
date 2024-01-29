@@ -1,3 +1,4 @@
+// Import required modules
 const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
@@ -6,9 +7,17 @@ const mongoose = require('mongoose');
 const { GridFsStorage } = require('multer-gridfs-storage');
 const bcrypt = require('bcrypt');
 
+
+
+
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+
+
+
 
 const mongoURI = 'mongodb+srv://akshaymmaimbilly:akshaymm@cluster0.iyvhtug.mongodb.net/?retryWrites=true&w=majority';
 
@@ -25,18 +34,6 @@ connection.once('open', async () => {
 
  
 
-  const storage = new GridFsStorage({
-    url: mongoURI,
-    cache: true,
-    file: (req, file) => {
-      return {
-        filename: 'file_' + Date.now(),
-        bucketName: 'uploads',
-      };
-    },
-  });
-
-  const upload = multer({ storage });
 
   const User = mongoose.model('User', new mongoose.Schema({
     username: String,
@@ -49,44 +46,60 @@ connection.once('open', async () => {
     uploadDate: Date,
   }));
 
-  const Patient = mongoose.model('Patient', new mongoose.Schema({
-    patientName: String,
-    pdfFileId: String,
-  }));
 
- 
-  app.post('/api/patient/add', upload.single('pdfFile'), async (req, res) => {
+  
+  
+  app.get('/patients', async (req, res) => {
     try {
-      const { patientName } = req.body;
-      const pdfFile = req.file;
-
-      if (!pdfFile) {
-        return res.status(400).json({ success: false, message: 'No PDF file uploaded' });
-      }
-
-      // Save the file to MongoDB using GridFS
-      const gfs = new mongoose.mongo.GridFSBucket(connection.db, {
-        bucketName: 'uploads',
-      });
-
-      const writeStream = gfs.openUploadStream(pdfFile.originalname);
-      writeStream.write(pdfFile.buffer);
-      writeStream.end();
-
-      // Save patient data with the GridFS file ID
-      const newPatient = new Patient({
-        patientName,
-        pdfFileId: writeStream.id, // Store the GridFS file ID in the Patient model
-      });
-
-      await newPatient.save();
-
-      return res.status(201).json({ success: true, message: 'Patient data added successfully' });
+      const patients = await Patient.find();
+      res.json(patients);
     } catch (error) {
-      console.error('Error during patient data saving:', error.message);
-      return res.status(500).json({ success: false, message: 'Internal Server Error', error: error.message });
+      console.error('Error fetching patients:', error);
+      res.status(500).json({ success: false, message: 'Error fetching patients' });
     }
   });
+
+
+  
+  
+
+
+ // Set up multer for handling multipart/form-data
+ const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+     cb(null, '/')
+  },
+  filename: function (req, file, cb) {
+     cb(null, file.fieldname + '-' + Date.now())
+  }
+ });
+ 
+ const upload = multer({ storage });
+ app.use('/uploads', express.static('uploads'));
+ 
+ const Patient = mongoose.model('Patient', {
+  name: String,
+  pdfPath: String,
+});
+
+app.post('/upload', upload.single('pdfFile'), async (req, res) => {
+  const { patientName } = req.body;
+  const pdfPath = req.file.path;
+
+  const newPatient = new Patient({
+    name: patientName,
+    pdfPath,
+  });
+
+  try {
+    await newPatient.save();
+    res.json({ success: true, message: 'Patient and PDF uploaded successfully' });
+  } catch (error) {
+    console.error('Error saving patient to database:', error);
+    res.status(500).json({ success: false, message: 'Error saving patient to database' });
+  }
+});
+   
 
   app.post('/api/user/register', async (req, res) => {
     const { username, password } = req.body;
@@ -128,30 +141,12 @@ connection.once('open', async () => {
     }
   });
 
-  app.post('/uploadFile', upload.single('file'), async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ success: false, message: 'No file uploaded' });
-      }
-
-      const fileInfo = {
-        filename: req.file.filename,
-        fileId: req.file.id,
-        uploadDate: new Date(),
-      };
-
-      const fileInfoModel = new FileInfo(fileInfo);
-      await fileInfoModel.save();
-
-      return res.status(201).json({ success: true, message: 'File uploaded', fileInfo });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ success: false, message: 'Internal Server Error' });
-    }
-  });
+  
 
   const port = 4000;
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });
 });
+
+
