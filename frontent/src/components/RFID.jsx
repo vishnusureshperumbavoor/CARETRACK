@@ -1,26 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 
-function App() {
- const [rfidData, setRfidData] = useState(null);
+const App = () => {
+  const [rfidValue, setRfidValue] = useState(null);
 
- const handleScan = async () => {
+  const handleScan = async () => {
     try {
-      const response = await fetch('http://192.168.1.80/scan');
-      if (!response.ok) throw new Error(response.statusText);
-
-      const data = await response.json();
-      setRfidData(data);
+      const response = await axios.post('http://localhost:4000/check-rfid', { rfidValue });
+      // Process the response, open modal, etc.
+      console.log(response.data);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error scanning RFID:', error);
     }
- };
+  };
 
- return (
-    <div className="App">
-      <button onClick={handleScan}>Scan</button>
-      {rfidData && <p>Scanned RFID Data: {rfidData}</p>}
+  return (
+    <div>
+      <button onClick={handleScan}>Click Here</button>
     </div>
- );
-}
+  );
+};
 
 export default App;
