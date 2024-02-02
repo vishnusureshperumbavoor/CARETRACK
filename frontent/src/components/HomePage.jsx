@@ -108,8 +108,7 @@ const HomePage = () => {
  </motion.h1>
  {showOptions && (
  <>
- <Button variants={buttonVariants} to="showdata">Show Data</Button>
- <Button variants={buttonVariantsRight} to="editdata" sendSignal={sendSignalToArduino}>Edit Data</Button>
+ <Button variants={buttonVariants} to="rfid">Click Here</Button>
  </>
  )}
  <Link to="/admin"></Link>
