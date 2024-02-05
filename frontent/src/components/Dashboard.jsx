@@ -13,6 +13,7 @@ const Dashboard = () => {
 
     try {
       await axios.post('http://localhost:4000/upload', formData);
+      console.log(formData)
       alert('File uploaded successfully!');
       window.location.reload(false);
     } catch (error) {
