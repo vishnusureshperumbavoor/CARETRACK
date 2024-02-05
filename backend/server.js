@@ -1,22 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const multer = require('multer');
 const cors = require('cors');
-const { GridFsStorage } = require('multer-gridfs-storage');
 const bcrypt = require('bcrypt');
-const axios = require('axios');
-
 const app = express();
+
 app.use(cors());
 app.use(bodyParser.json());
-
-
-
-//......................................................
-
-
-
 
 // MongoDB Connection
 const mongoURI = 'mongodb+srv://akshaymmaimbilly:akshaymm@cluster0.iyvhtug.mongodb.net/?retryWrites=true&w=majority';
@@ -32,94 +22,43 @@ connection.on('error', (err) => {
 connection.once('open', async () => {
   console.log('Connected to MongoDB');
 
+  // Define Patient Schema
+  const patientSchema = new mongoose.Schema({
+    id: Number,
+    name: String,
+    gender: String,
+    dob: String,
+    phoneno: Number,
+    bystanderph: Number,
+    email: String,
+    age: Number,
+    place: String,
+    height: Number,
+    weight: Number,
+    hospital: String,
+    treatment: String,
+    allergies: String,
+    medicalalerts: String,
+    principledoctor: String,
+    reasonforadmission: String,
+    principlediagnosis: String,
+    secondarydiagnosis: String,
+    otherdiagnosis: String,
+    operationprocedure: String,
+    description: String,
+    medicine: String,
+    patienthistory: String,
+  });
 
-//......................................................
+  const Patient = mongoose.model('Patient', patientSchema);
 
-// MongoDB Models and Schemas
-const RfidSchema = new mongoose.Schema({
-   rfid: String,
-   data: String,
-});
-
-const Rfid = mongoose.model('Rfid', RfidSchema);
-
-
-//pdf upload
-const patientSchema = new mongoose.Schema({
-  name: String,
-  pdfPath: String,
-  // other fields as needed
-});
-const Patient = mongoose.model('Patient', patientSchema);
-
-
-  // MongoDB Models and Schemas
-  const User = mongoose.model('User', new mongoose.Schema({
+  // Define User Schema
+  const userSchema = new mongoose.Schema({
     username: String,
     password: String,
-  }));
-
-  const FileInfo = mongoose.model('FileInfo', new mongoose.Schema({
-    filename: String,
-    fileId: String,
-    uploadDate: Date,
-  }));
-
-
-//rfid schema
-
-const UserSchema = new mongoose.Schema({
-  uid: String,
-  // Other fields...
- });
-
-
-
-
-//......................................................
-
-
-
-
-
-  // Multer Setup
-  const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, '/');
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.fieldname + '-' + Date.now());
-    }
   });
 
-  const upload = multer({ storage });
-  app.use('/uploads', express.static('uploads'));
-
-
-//......................................................
-
-
-  // PDF Upload Endpoint
-  app.post('/upload', upload.single('pdfFile'), async (req, res) => {
-    const { patientName } = req.body;
-    const pdfPath = req.file.path;
-
-    const newPatient =  Patient({
-      name: patientName,
-      pdfPath,
-    });
-
-    try {
-      await newPatient.save();
-      res.json({ success: true, message: 'Patient and PDF uploaded successfully' });
-    } catch (error) {
-      console.error('Error saving patient to database:', error);
-      res.status(500).json({ success: false, message: 'Error saving patient to database' });
-    }
-  });
-//......................................................
-
-
+  const User = mongoose.model('User', userSchema);
 
   // User Registration Endpoint
   app.post('/api/user/register', async (req, res) => {
@@ -144,12 +83,6 @@ const UserSchema = new mongoose.Schema({
     }
   });
 
-
-  //......................................................
-
-
-
-
   // User Login Endpoint
   app.post('/api/user/login', async (req, res) => {
     const { username, password } = req.body;
@@ -168,35 +101,30 @@ const UserSchema = new mongoose.Schema({
       res.json({ success: false, message: 'Invalid credentials' });
     }
   });
+
   
- //......................................................
 
-
- const UserModel = mongoose.model('Users', UserSchema);
- app.post('/button-click', async (req, res) => {
-  try {
-     // Send a request to NodeMCU
-     const nodeResponse = await axios.post('http://192.168.0.1:80/scan-rfid');
- 
-     // Extract UID from the response
-     const uid = nodeResponse.data.uid;
- 
-     // Check if UID exists in MongoDB
-     const user = await UserModel.findOne({ uid: uid });
-     if (user) {
-       res.json({ exists: true });
-     } else {
-       res.json({ exists: false });
-     }
-  } catch (error) {
-     console.error('Error communicating with NodeMCU:', error.message);
-     res.status(500).json({ error: 'Failed to communicate with NodeMCU' });
-  }
- });
-
-
-//.........................................................
-
+  app.post('/api/patient', async (req, res) => {
+   try {
+      const { dob, ...patientData } = req.body;
+      if (dob) {
+        patientData.age = calculateAge(dob);
+      }
+      const newPatient = new Patient(patientData);
+      await newPatient.save();
+      res.status(200).json({ message: 'Patient data saved successfully' });
+   } catch (error) {
+      console.error('Error saving patient data', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+   }
+  });
+  
+  const calculateAge = (dob) => {
+   const birthDate = new Date(dob);
+   const today = new Date();
+   return today.getFullYear() - birthDate.getFullYear();
+  };
+  
   // Server Listening
   const port = 4000;
   app.listen(port, () => {
