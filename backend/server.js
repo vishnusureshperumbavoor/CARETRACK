@@ -24,32 +24,34 @@ connection.once('open', async () => {
 
   // Define Patient Schema
   const patientSchema = new mongoose.Schema({
-    id: Number,
-    name: String,
-    gender: String,
-    dob: String,
-    phoneno: Number,
-    bystanderph: Number,
-    email: String,
-    age: Number,
-    place: String,
-    height: Number,
-    weight: Number,
-    hospital: String,
-    treatment: String,
-    allergies: String,
-    medicalalerts: String,
-    principledoctor: String,
-    reasonforadmission: String,
-    principlediagnosis: String,
-    secondarydiagnosis: String,
-    otherdiagnosis: String,
-    operationprocedure: String,
-    description: String,
-    medicine: String,
-    patienthistory: String,
+    personalDetails: {
+      id: String,
+      name: String,
+      gender: String,
+      dob: Date,
+      age: Number,
+      place: String
+    },
+    contactDetails: {
+      phoneNumber: String,
+      bystanderPhoneNumber: String,
+      email: String
+    },
+    medicalRecords: {
+      allergies: String,
+      treatments: String,
+      medicalAlerts: String,
+      principleDoctor: String,
+      hospital: String,
+      reasonForAdmission: String,
+      principleDiagnosis: String,
+      otherDiagnosis: String,
+      operationProcedure: String,
+      description: String,
+      medicines: String,
+      patientHistory: String
+    }
   });
-
   const Patient = mongoose.model('Patient', patientSchema);
 
   // Define User Schema
@@ -104,20 +106,17 @@ connection.once('open', async () => {
 
   
 
-  app.post('/api/patient', async (req, res) => {
-   try {
-      const { dob, ...patientData } = req.body;
-      if (dob) {
-        patientData.age = calculateAge(dob);
-      }
-      const newPatient = new Patient(patientData);
-      await newPatient.save();
-      res.status(200).json({ message: 'Patient data saved successfully' });
-   } catch (error) {
-      console.error('Error saving patient data', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-   }
-  });
+  // API routes
+app.post('/api/patient', async (req, res) => {
+  try {
+    const newPatient = new Patient(req.body);
+    await newPatient.save();
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error submitting patient data:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
   
   const calculateAge = (dob) => {
    const birthDate = new Date(dob);

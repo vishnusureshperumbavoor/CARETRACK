@@ -44,15 +44,7 @@ function Appdraw() {
        <ListItem button onClick={handleDrawerClose}>
          <ListItemText primary="New User" />
        </ListItem>
-       <ListItem button onClick={handleDrawerClose}>
-         <ListItemText primary="Menu 3" />
-       </ListItem>
-       <ListItem button onClick={handleDrawerClose}>
-         <ListItemText primary="Menu 4" />
-       </ListItem>
-       <ListItem button onClick={handleDrawerClose}>
-         <ListItemText primary="Menu 5" />
-       </ListItem>
+      
      </List>
    </Drawer>
  </>
