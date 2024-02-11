@@ -104,20 +104,73 @@ connection.once('open', async () => {
     }
   });
 
-  
-
-  // API routes
-app.post('/api/patient', async (req, res) => {
+  // Routes
+app.get('/api/patient', async (req, res) => {
   try {
-    const newPatient = new Patient(req.body);
-    await newPatient.save();
-    res.json({ success: true });
+    const patient = await Patient.findOne();
+    res.json(patient);
   } catch (error) {
-    console.error('Error submitting patient data:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
+    console.error('Error fetching patient data:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
+  //api endpoint
+  app.post('/api/patient/personalDetails', async (req, res) => {
+    const newData = req.body;
+    try {
+      const patient = await Patient.findOneAndUpdate({}, { personalDetails: newData }, { new: true, upsert: true });
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error updating personal details:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
   
+  app.post('/api/patient/contactDetails', async (req, res) => {
+    const newData = req.body;
+    try {
+      const patient = await Patient.findOneAndUpdate({}, { contactDetails: newData }, { new: true, upsert: true });
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error updating contact details:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+  
+  app.post('/api/patient/medicalRecords', async (req, res) => {
+    const newData = req.body;
+    try {
+      const patient = await Patient.findOneAndUpdate({}, { medicalRecords: newData }, { new: true, upsert: true });
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error updating medical records:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+// Routes
+app.get('/api/patient', async (req, res) => {
+  try {
+    const patient = await Patient.findOne();
+    res.json(patient);
+  } catch (error) {
+    console.error('Error fetching patient data:', error);
+    res.status(500).json({ error: 'An error occurred while fetching patient data.' });
+  }
+});
+
+app.post('/api/patient/update', async (req, res) => {
+  const updatedData = req.body;
+
+  try {
+    await Patient.updateOne({}, updatedData);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error updating patient data:', error);
+    res.status(500).json({ error: 'An error occurred while updating patient data.' });
+  }
+});
+
   const calculateAge = (dob) => {
    const birthDate = new Date(dob);
    const today = new Date();

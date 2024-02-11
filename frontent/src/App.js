@@ -5,11 +5,11 @@ import HomePage from './components/HomePage';
 
 
 import Appdraw from './components/Appdraw';
-import Showdata from './components/Showdata';
 import Editdata from './components/Editdata';
 import Register from './components/Register';
 import AdminLogin from './components/AdminLogin';
 import Dashboard from './components/Dashboard';
+import ViewPatient from './components/ViewPatient';
 
 
 
@@ -20,12 +20,12 @@ function App() {
      <Routes>
       
        <Route path="/" element={<HomePage />} />
-       <Route path="showdata" element={<Showdata />} />
        <Route path="editdata" element={<Editdata />} />
        <Route path="register" element={<Register />} />
        <Route path="admin" element={<AdminLogin />} />
        <Route path="dashboard" element={<Dashboard/>} />
-     
+       <Route path="viewpatient" element={<ViewPatient/>} />
+      
       
      </Routes>
    </Router>

@@ -10,6 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import { Link } from 'react-router-dom';
 
 function Appdraw() {
  const [open, setOpen] = React.useState(false);
@@ -39,12 +40,15 @@ function Appdraw() {
    <Drawer anchor="left" open={open} onClose={handleDrawerClose} PaperProps={{ style: { backgroundColor: '#00838f', color: '#e0f7fa' } }}>
      <List>
        <ListItem button onClick={handleDrawerClose}>
-         <ListItemText primary="User Details" />
+         <Button variant='contained' ><Link to="/viewpatient">
+           <ListItemText primary="Patient INFO" /></Link>
+         </Button>
        </ListItem>
        <ListItem button onClick={handleDrawerClose}>
-         <ListItemText primary="New User" />
+         <Button variant='contained'><Link to="/dashboard">
+           <ListItemText primary="New Patient" /></Link>
+         </Button>
        </ListItem>
-      
      </List>
    </Drawer>
  </>
