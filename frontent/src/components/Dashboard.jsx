@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import MenuItem from '@mui/material/MenuItem';
 
 const Dashboard = () => {
+ 
   const [patientData, setPatientData] = useState({
     personalDetails: {
       id: "",
@@ -35,8 +37,6 @@ const Dashboard = () => {
     }
   });
 
-  
-    
   const handlePersonalDetailsChange = (e) => {
     const { name, value } = e.target;
     if (name === 'dob') {
@@ -48,7 +48,7 @@ const Dashboard = () => {
         personalDetails: {
           ...prevData.personalDetails,
           [name]: value,
-          age: age.toString()  // Convert age to string and update the state
+          age: age.toString() // Convert age to string and update the state
         }
       }));
     } else {
@@ -84,6 +84,8 @@ const Dashboard = () => {
     }));
   };
 
+
+  
   const handleSubmit = async () => {
     try {
       await axios.post('http://localhost:4000/api/patient/personalDetails', patientData.personalDetails);
@@ -97,16 +99,22 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="formContainer fade-in">
+    <div className="formContainer fade-in" style={{
+      display: 'flex',
+      justifyContent: 'center', // Horizontal centering
+      alignItems: 'center',     // Vertical centering
+    }}>
       <div style={{
         maxWidth: '1000px',
         margin: '0px',
         padding: '20px',
-        border: '20px solid #ccc',
+        border: '20px solid #ccb',
         borderRadius: '50px',
         backgroundColor: '#ADD8E6',
       }}>
         <h1 style={{ textAlign: 'center', marginBottom: '40px' }}>MEDICAL REPORT</h1>
+
+
         <Grid container spacing={3}>
           {/* Personal Details */}
           <Grid item xs={12}>
@@ -193,7 +201,7 @@ const Dashboard = () => {
           {/* Buttons */}
           <Grid item xs={12}>
             <div style={{ marginBottom: '50px' }}>
-              <button onClick={handleSubmit}>Save</button>
+              <Button variant="contained" color='success' onClick={handleSubmit}>Save</Button>
             </div>
           </Grid>
         </Grid>

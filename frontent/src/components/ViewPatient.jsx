@@ -53,6 +53,17 @@ const ViewPatient = () => {
       personalDetails: {
         ...formData.personalDetails,
         [name]: value
+
+      },
+      contactDetails: {
+        ...formData.contactDetails,
+        [name]: value
+
+      },
+      medicalRecords: {
+        ...formData.medicalRecords,
+        [name]: value
+
       }
     };
 

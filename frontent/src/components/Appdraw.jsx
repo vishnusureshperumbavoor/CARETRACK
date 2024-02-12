@@ -34,7 +34,7 @@ function Appdraw() {
        
        </Typography>
        <Box sx={{ flexGrow: 1 }} />
-       <Button color="inherit">About</Button>
+       <Button color="inherit"><Link to="/about">About</Link></Button>
      </Toolbar>
    </AppBar>
    <Drawer anchor="left" open={open} onClose={handleDrawerClose} PaperProps={{ style: { backgroundColor: '#00838f', color: '#e0f7fa' } }}>

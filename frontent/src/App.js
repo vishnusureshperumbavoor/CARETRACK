@@ -10,6 +10,9 @@ import Register from './components/Register';
 import AdminLogin from './components/AdminLogin';
 import Dashboard from './components/Dashboard';
 import ViewPatient from './components/ViewPatient';
+import Ab from './components/Ab';
+
+
 
 
 
@@ -25,6 +28,8 @@ function App() {
        <Route path="admin" element={<AdminLogin />} />
        <Route path="dashboard" element={<Dashboard/>} />
        <Route path="viewpatient" element={<ViewPatient/>} />
+       <Route path="about" element={<Ab/>} />
+       
       
       
      </Routes>

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const multer = require('multer');
 const app = express();
 
 app.use(cors());
@@ -62,6 +63,35 @@ connection.once('open', async () => {
 
   const User = mongoose.model('User', userSchema);
 
+  const imageSchema = new mongoose.Schema({
+    name: {
+      type: String,
+      required: true
+    },
+    path: {
+      type: String,
+      required: true
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  });
+  
+  // Create the Image model
+  const Image = mongoose.model('Image', imageSchema);
+
+  // Multer configuration
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, '.');
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+
+const upload = multer({ storage: storage });
   // User Registration Endpoint
   app.post('/api/user/register', async (req, res) => {
     const { username, password } = req.body;
@@ -176,6 +206,25 @@ app.post('/api/patient/update', async (req, res) => {
    const today = new Date();
    return today.getFullYear() - birthDate.getFullYear();
   };
+
+  // Route to handle image upload
+app.post('/upload', upload.single('image'), async (req, res) => {
+  try {
+    // Create a new document for the image
+    const newImage = new Image({
+      name: req.file.filename,
+      path: req.file.path
+    });
+
+    // Save the image to MongoDB
+    const savedImage = await newImage.save();
+
+    res.json(savedImage);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to upload image' });
+  }
+});
   
   // Server Listening
   const port = 4000;
