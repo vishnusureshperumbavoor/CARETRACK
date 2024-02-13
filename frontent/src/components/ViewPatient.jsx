@@ -10,6 +10,8 @@ const ViewPatient = () => {
   const [editable, setEditable] = useState(false);
   const [formData, setFormData] = useState(null);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [fieldsChanged, setFieldsChanged] = useState({});
+  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
     const fetchPatientData = async () => {
@@ -24,13 +26,41 @@ const ViewPatient = () => {
     };
 
     fetchPatientData();
-  }, []);
+  }, 
+  []);
+  
+
+  useEffect(() => {
+    if (patientData && formData) {
+      const updatedFields = {};
+
+      for (const key in patientData.personalDetails) {
+        if (patientData.personalDetails[key] !== formData.personalDetails[key]) {
+          updatedFields[`personalDetails.${key}`] = true;
+        }
+      }
+
+      for (const key in patientData.contactDetails) {
+        if (patientData.contactDetails[key] !== formData.contactDetails[key]) {
+          updatedFields[`contactDetails.${key}`] = true;
+        }
+      }
+
+      for (const key in patientData.medicalRecords) {
+        if (patientData.medicalRecords[key] !== formData.medicalRecords[key]) {
+          updatedFields[`medicalRecords.${key}`] = true;
+        }
+      }
+
+      setFieldsChanged(updatedFields);
+    }
+  }, [patientData, formData]);
 
   const handleEdit = () => {
     setEditable(true);
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     setConfirmDialogOpen(true);
   };
 
@@ -50,30 +80,8 @@ const ViewPatient = () => {
     const { name, value } = e.target;
     const updatedFormData = {
       ...formData,
-      personalDetails: {
-        ...formData.personalDetails,
-        [name]: value
-
-      },
-      contactDetails: {
-        ...formData.contactDetails,
-        [name]: value
-
-      },
-      medicalRecords: {
-        ...formData.medicalRecords,
-        [name]: value
-
-      }
+      [name]: value
     };
-
-    // Calculate age based on updated date of birth
-    if (name === 'dob') {
-      const dob = new Date(value);
-      const today = new Date();
-      const age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
-      updatedFormData.personalDetails.age = age.toString();
-    }
 
     setFormData(updatedFormData);
   };
@@ -86,209 +94,59 @@ const ViewPatient = () => {
         <div>
           <h1>Patient Details</h1>
           <h2>Personal details</h2>
+
+          <div>
+      {imageUrl && <img src={imageUrl} alt="Uploaded" />}
+    </div>
+          
           <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <p>Id: {patientData.personalDetails.id}</p>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="name"
-                label="Name"
-                value={editable ? formData.personalDetails.name : patientData.personalDetails.name}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="gender"
-                label="Gender"
-                value={editable ? formData.personalDetails.gender : patientData.personalDetails.gender}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="dob"
-                label="Date of Birth"
-                type="date"
-                value={editable ? formData.personalDetails.dob : patientData.personalDetails.dob}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="place"
-                label="Place"
-                value={editable ? formData.personalDetails.place : patientData.personalDetails.place}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
+            {Object.entries(patientData.personalDetails).map(([key, value]) => (
+              <Grid item xs={6} key={key}>
+                <TextField
+                  name={key}
+                  label={key}
+                  value={editable ? formData.personalDetails[key] : value}
+                  onChange={handleChange}
+                  disabled={!editable}
+                  fullWidth
+                  error={fieldsChanged[`personalDetails.${key}`]}
+                />
+              </Grid>
+            ))}
           </Grid>
 
           <h2>Contact Details</h2>
           <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <TextField
-                name="phoneNumber"
-                label="Phone Number"
-                value={editable ? formData.contactDetails.phoneNumber : patientData.contactDetails.phoneNumber}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="bystanderPhoneNumber"
-                label="Bystander Phone"
-                value={editable ? formData.contactDetails.bystanderPhoneNumber : patientData.contactDetails.bystanderPhoneNumber}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="email"
-                label="Email Id"
-                value={editable ? formData.contactDetails.email : patientData.contactDetails.email}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
+            {Object.entries(patientData.contactDetails).map(([key, value]) => (
+              <Grid item xs={6} key={key}>
+                <TextField
+                  name={key}
+                  label={key}
+                  value={editable ? formData.contactDetails[key] : value}
+                  onChange={handleChange}
+                  disabled={!editable}
+                  fullWidth
+                  error={fieldsChanged[`contactDetails.${key}`]}
+                />
+              </Grid>
+            ))}
           </Grid>
 
           <h2>Medical Records</h2>
           <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <TextField
-                name="allergies"
-                label="Allergies"
-                value={editable ? formData.medicalRecords.allergies : patientData.medicalRecords.allergies}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="medicalAlerts"
-                label="Medical Alerts"
-                value={editable ? formData.medicalRecords.medicalAlerts : patientData.medicalRecords.medicalAlerts}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="principleDoctor"
-                label="Principle Doctor"
-                value={editable ? formData.medicalRecords.principleDoctor : patientData.medicalRecords.principleDoctor}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="hospital"
-                label="Hospital"
-                value={editable ? formData.medicalRecords.hospital : patientData.medicalRecords.hospital}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="reasonForAdmission"
-                label="Reason For Admission"
-                value={editable ? formData.medicalRecords.reasonForAdmission : patientData.medicalRecords.reasonForAdmission}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="principleDiagnosis"
-                label="Principle Diagnosis"
-                value={editable ? formData.medicalRecords.principleDiagnosis : patientData.medicalRecords.principleDiagnosis}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="otherDiagnosis"
-                label="Other Diagnosis"
-                value={editable ? formData.medicalRecords.otherDiagnosis : patientData.medicalRecords.otherDiagnosis}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="operationProcedure"
-                label="Operation Procedure"
-                value={editable ? formData.medicalRecords.operationProcedure : patientData.medicalRecords.operationProcedure}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="description"
-                label="Description"
-                value={editable ? formData.medicalRecords.description : patientData.medicalRecords.description}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="medicines"
-                label="Medicines"
-                value={editable ? formData.medicalRecords.medicines : patientData.medicalRecords.medicines}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="patientHistory"
-                label="Patient History"
-                value={editable ? formData.medicalRecords.patientHistory : patientData.medicalRecords.patientHistory}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                name="treatments"
-                label="Treatment"
-                value={editable ? formData.medicalRecords.treatments : patientData.medicalRecords.treatments}
-                onChange={handleChange}
-                disabled={!editable}
-                fullWidth
-              />
-            </Grid>
+            {Object.entries(patientData.medicalRecords).map(([key, value]) => (
+              <Grid item xs={6} key={key}>
+                <TextField
+                  name={key}
+                  label={key}
+                  value={editable ? formData.medicalRecords[key] : value}
+                  onChange={handleChange}
+                  disabled={!editable}
+                  fullWidth
+                  error={fieldsChanged[`medicalRecords.${key}`]}
+                />
+              </Grid>
+            ))}
           </Grid>
 
           <div style={{ marginTop: '20px' }}>
@@ -298,6 +156,9 @@ const ViewPatient = () => {
               <Button variant="contained" sx={{ mr: 2 }} onClick={handleEdit}>Edit</Button>
             )}
           </div>
+
+          
+
         </div>
       ) : (
         <p>No patient data found.</p>
