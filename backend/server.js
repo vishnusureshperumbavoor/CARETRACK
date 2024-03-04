@@ -108,6 +108,17 @@ connection.once('open', async () => {
     }
   });
 
+  // Get All Images Endpoint
+app.get('/images', async (req, res) => {
+  try {
+    const images = await Image.find();
+    res.json(images);
+  } catch (error) {
+    console.error('Error retrieving images:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
  
 
   // User Registration Endpoint

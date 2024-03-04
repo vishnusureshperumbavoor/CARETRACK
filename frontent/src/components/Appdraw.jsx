@@ -40,7 +40,7 @@ function Appdraw() {
    <Drawer anchor="left" open={open} onClose={handleDrawerClose} PaperProps={{ style: { backgroundColor: '#00838f', color: '#e0f7fa' } }}>
      <List>
        <ListItem button onClick={handleDrawerClose}>
-         <Button variant='contained' ><Link to="/viewpatient">
+         <Button variant='contained' ><Link to="/button">
            <ListItemText primary="Patient INFO" /></Link>
          </Button>
        </ListItem>

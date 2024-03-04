@@ -20,15 +20,16 @@ const ViewPatient = () => {
         setPatientData(response.data);
         setFormData(response.data);
         setLoading(false);
+        if (response.data && response.data.imageUrl) {
+          setImageUrl(response.data.imageUrl);
+        }
       } catch (error) {
         console.error('Error fetching patient data:', error);
       }
     };
 
     fetchPatientData();
-  }, 
-  []);
-  
+  }, []);
 
   useEffect(() => {
     if (patientData && formData) {
@@ -96,9 +97,9 @@ const ViewPatient = () => {
           <h2>Personal details</h2>
 
           <div>
-      {imageUrl && <img src={imageUrl} alt="Uploaded" />}
-    </div>
-          
+            {imageUrl && <img src={imageUrl} alt="Uploaded" />}
+          </div>
+
           <Grid container spacing={2}>
             {Object.entries(patientData.personalDetails).map(([key, value]) => (
               <Grid item xs={6} key={key}>
@@ -156,8 +157,6 @@ const ViewPatient = () => {
               <Button variant="contained" sx={{ mr: 2 }} onClick={handleEdit}>Edit</Button>
             )}
           </div>
-
-          
 
         </div>
       ) : (

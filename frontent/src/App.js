@@ -10,6 +10,7 @@ import Register from './components/Register';
 import AdminLogin from './components/AdminLogin';
 import Dashboard from './components/Dashboard';
 import ViewPatient from './components/ViewPatient';
+import Button from './components/Button';
 import Ab from './components/Ab';
 
 
@@ -23,6 +24,7 @@ function App() {
      <Routes>
       
        <Route path="/" element={<HomePage />} />
+       <Route path="button" element={<Button />} />
        <Route path="editdata" element={<Editdata />} />
        <Route path="register" element={<Register />} />
        <Route path="admin" element={<AdminLogin />} />
