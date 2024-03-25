@@ -5,9 +5,10 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
-
-
 const app = express();
+const http = require('http');
+const { Server } = require('socket.io');
+const SerialPort = require('serialport');
 
 // Middleware
 app.use(cors());
@@ -206,10 +207,6 @@ app.post('/api/patient/update', async (req, res) => {
    const today = new Date();
    return today.getFullYear() - birthDate.getFullYear();
   };
-
-  
- 
-
   
   // Server Listening
   const port = 4000;
