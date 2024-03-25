@@ -10,6 +10,7 @@ import ViewPatient from './components/ViewPatient';
 import PatientInfo from './components/PatientInfo';
 import Button from './components/Button';
 import Ab from './components/Ab';
+import Medical_History_Form1 from './components/Medical_History_Form1';
 
 function App() {
  return (
@@ -24,6 +25,7 @@ function App() {
        <Route path="dashboard" element={<Dashboard/>} />
        <Route path="viewpatient" element={<ViewPatient/>} />
        <Route path="patientInfo" element={<PatientInfo/>} />
+       <Route path="medicalHistory1" element={<Medical_History_Form1/>}/>
        <Route path="about" element={<Ab/>} />
      </Routes>
    </Router>
