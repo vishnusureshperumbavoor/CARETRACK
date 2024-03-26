@@ -11,6 +11,7 @@ import PatientInfo from './components/PatientInfo';
 import Button from './components/Button';
 import Ab from './components/Ab';
 import MedicalHistoryForm1 from './components/MedicalHistoryForm1';
+import MedicalHistoryForm2 from './components/MedicalHistoryForm2';
 
 function App() {
  return (
@@ -26,6 +27,7 @@ function App() {
        <Route path="viewpatient" element={<ViewPatient/>} />
        <Route path="patientInfo" element={<PatientInfo/>} />
        <Route path="medicalHistory1" element={<MedicalHistoryForm1/>}/>
+       <Route path="medicalHistory2" element={<MedicalHistoryForm2/>}/>
        <Route path="about" element={<Ab/>} />
      </Routes>
    </Router>
