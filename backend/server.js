@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
 const app = express();
@@ -130,10 +130,10 @@ app.get('/images', async (req, res) => {
         return res.json({ success: false, message: 'Username already exists' });
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+      // const hashedPassword = await bcrypt.hash(password, 10);
 
-      const newUser = new User({ username, password: hashedPassword });
-      await newUser.save();
+      // const newUser = new User({ username, password: hashedPassword });
+      // await newUser.save();
 
       res.json({ success: true, message: 'User registered successfully' });
     } catch (error) {
@@ -149,13 +149,13 @@ app.get('/images', async (req, res) => {
     const user = await User.findOne({ username });
 
     if (user) {
-      const passwordMatch = await bcrypt.compare(password, user.password);
+      // const passwordMatch = await bcrypt.compare(password, user.password);
 
-      if (passwordMatch) {
-        res.json({ success: true, message: 'Login successful' });
-      } else {
-        res.json({ success: false, message: 'Invalid credentials' });
-      }
+      // if (passwordMatch) {
+      //   res.json({ success: true, message: 'Login successful' });
+      // } else {
+      //   res.json({ success: false, message: 'Invalid credentials' });
+      // }
     } else {
       res.json({ success: false, message: 'Invalid credentials' });
     }
