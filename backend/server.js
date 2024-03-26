@@ -6,9 +6,6 @@ const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
 const app = express();
-const http = require('http');
-const { Server } = require('socket.io');
-const SerialPort = require('serialport');
 
 // Middleware
 app.use(cors());

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 
-const Ab = () => {
+const About = () => {
   return (
     <div>
       <Helmet>
@@ -27,4 +27,4 @@ const Ab = () => {
   );
 };
 
-export default Ab;
+export default About;

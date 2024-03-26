@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
@@ -66,7 +65,7 @@ const PatientInfo = () => {
                 color="success"
                 onClick={handleSubmit}
               >
-                Save
+                Submit
               </Button>
             </div>
           </Grid>
