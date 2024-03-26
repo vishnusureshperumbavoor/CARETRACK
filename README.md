@@ -5,11 +5,17 @@
 * Visual Studio Code (recommended)
 
 ## How to set up
-Clone the repo
+Clone the repo  
 Open in Visual Studio Code  
 Start frontend
 ```
 cd frontend
+npm install
+npm start
+```
+Start backend  
+```
+cd backend
 npm install
 npm start
 ```
